@@ -494,6 +494,33 @@ EndFunction
 
 
 ; -----------------------------------
+; GetQuestObjectiveSetForm 
+;
+; Description: Returns the form from a WorkshopFramework:Library:DataStructures:QuestStageSet struct
+;
+; Added: 1.1.12
+; -----------------------------------
+
+Quest Function GetQuestObjectiveSetForm(QuestObjectiveSet aQuestSet) global
+	if( ! aQuestSet)
+		return None
+	endif
+	
+	Quest thisForm
+	
+	if(aQuestSet.QuestForm)
+		thisForm = aQuestSet.QuestForm
+	elseif(aQuestSet.iFormID > 0 && aQuestSet.sPluginName != "" && Game.IsPluginInstalled(aQuestSet.sPluginName))
+		thisForm = Game.GetFormFromFile(aQuestSet.iFormID, aQuestSet.sPluginName) as Quest
+	else
+		return None
+	endif
+	
+	return thisForm
+EndFunction
+
+
+; -----------------------------------
 ; CheckQuestStageSet
 ; 
 ; Description: Checks if a QuestStageSet passes
@@ -521,187 +548,30 @@ EndFunction
 
 
 ; -----------------------------------
-; GetQuestObjectiveSetForm 
-;
-; Description: Returns the form from a WorkshopFramework:Library:DataStructures:QuestStageSet struct
-;
-; Added: 1.2.0
-; -----------------------------------
-
-Quest Function GetQuestObjectiveSetForm(QuestObjectiveSet aQuestSet) global
-	if( ! aQuestSet)
-		return None
-	endif
-
-	Quest thisForm
-
-	if(aQuestSet.QuestForm)
-		thisForm = aQuestSet.QuestForm
-	elseif(aQuestSet.iFormID > 0 && aQuestSet.sPluginName != "" && Game.IsPluginInstalled(aQuestSet.sPluginName))
-		thisForm = Game.GetFormFromFile(aQuestSet.iFormID, aQuestSet.sPluginName) as Quest
-	else
-		return None
-	endif
-
-	return thisForm
-EndFunction
-
-; -----------------------------------
 ; CheckQuestObjectiveSet
 ; 
 ; Description: Checks if a QuestObjectiveSet passes
 ;
-; Added: 1.2.0
+; Added: 1.1.12
 ; -----------------------------------
 
 Bool Function CheckQuestObjectiveSet(QuestObjectiveSet aQuestObjectiveSet) global
 	Quest thisForm = GetQuestObjectiveSetForm(aQuestObjectiveSet)
-
+	
 	if(thisForm)
 		if(aQuestObjectiveSet.iCompareMethod == -1)
 			return thisForm.IsObjectiveFailed(aQuestObjectiveSet.iObjective)
 		elseif(aQuestObjectiveSet.iCompareMethod == 0)
-			return ( ! thisForm.IsObjectiveFailed(aQuestObjectiveSet.iObjective) && ! thisForm.IsObjectiveCompleted(aQuestObjectiveSet.iObjective))
+			return !thisForm.IsObjectiveFailed(aQuestObjectiveSet.iObjective) && !thisForm.IsObjectiveCompleted(aQuestObjectiveSet.iObjective)
 		elseif(aQuestObjectiveSet.iCompareMethod == 1)
 			return thisForm.IsObjectiveCompleted(aQuestObjectiveSet.iObjective)
 		endif
 	endif
-
+	
 	; Quest not found
 	return false
 EndFunction
 
-
-; -----------------------------------
-; GetScriptPropertySetCheckForm 
-;
-; Description: Returns the form from a WorkshopFramework:Library:DataStructures:ScriptPropertySet struct
-;
-; Added: 1.2.0
-; -----------------------------------
-
-Form Function GetScriptPropertySetCheckForm(ScriptPropertySet aScriptPropertySet) global
-	if( ! aScriptPropertySet)
-		return None
-	endif
-	
-	Form thisForm
-	
-	if(aScriptPropertySet.CheckForm)
-		thisForm = aScriptPropertySet.CheckForm
-	elseif(aScriptPropertySet.iCheckFormID > 0 && aScriptPropertySet.sCheckPluginName != "" && Game.IsPluginInstalled(aScriptPropertySet.sCheckPluginName))
-		thisForm = Game.GetFormFromFile(aScriptPropertySet.iCheckFormID, aScriptPropertySet.sCheckPluginName)
-	else
-		return None
-	endif
-	
-	return thisForm
-EndFunction
-
-
-; -----------------------------------
-; GetScriptPropertySetMatchForm 
-;
-; Description: Returns the form from a WorkshopFramework:Library:DataStructures:ScriptPropertySet struct
-;
-; Added: 1.2.0
-; -----------------------------------
-
-Form Function GetScriptPropertySetMatchForm(ScriptPropertySet aScriptPropertySet) global
-	if( ! aScriptPropertySet)
-		return None
-	endif
-	
-	Form thisForm
-	
-	if(aScriptPropertySet.MatchForm)
-		thisForm = aScriptPropertySet.MatchForm
-	elseif(aScriptPropertySet.iMatchFormID > 0 && aScriptPropertySet.sMatchPluginName != "" && Game.IsPluginInstalled(aScriptPropertySet.sMatchPluginName))
-		thisForm = Game.GetFormFromFile(aScriptPropertySet.iMatchFormID, aScriptPropertySet.sMatchPluginName)
-	else
-		return None
-	endif
-	
-	return thisForm
-EndFunction
-
-
-; -----------------------------------
-; CheckScriptPropertySet
-; 
-; Description: Checks if a ScriptPropertySet passes
-;
-; Added: 1.2.0
-; -----------------------------------
-
-Bool Function CheckScriptPropertySet(ScriptPropertySet aScriptPropertySet) global
-	Form thisForm = GetScriptPropertySetCheckForm(aScriptPropertySet)
-	
-	ScriptObject CastForm = thisForm.CastAs(aScriptPropertySet.sScriptName)
-	
-	if(CastForm && aScriptPropertySet.sPropertyName != "")
-		Var vPropertyValue = CastForm.GetPropertyValue(aScriptPropertySet.sPropertyName)
-		
-		if(vPropertyValue is Bool)
-			if(vPropertyValue as Bool == aScriptPropertySet.fValue as Bool)
-				return true
-			endif
-		elseif(vPropertyValue is Int || vPropertyValue is Float)
-			Float fPropertyValue = vPropertyValue as Float
-			if(aScriptPropertySet.iCompareMethod == -2)
-				if(fPropertyValue < aScriptPropertySet.fValue)
-					return true
-				endif
-			elseif(aScriptPropertySet.iCompareMethod == -1)
-				if(fPropertyValue <= aScriptPropertySet.fValue)
-					return true
-				endif
-			elseif(aScriptPropertySet.iCompareMethod == 0)
-				if(fPropertyValue == aScriptPropertySet.fValue)
-					return true
-				endif
-			elseif(aScriptPropertySet.iCompareMethod == 1)
-				if(fPropertyValue >= aScriptPropertySet.fValue)
-					return true
-				endif
-			elseif(aScriptPropertySet.iCompareMethod == 2)
-				if(fPropertyValue > aScriptPropertySet.fValue)
-					return true
-				endif
-			endif
-		elseif(vPropertyValue is String)
-			String sPropertyValue = vPropertyValue as String
-			
-			if(sPropertyValue == aScriptPropertySet.fValue)
-				if(aScriptPropertySet.iCompareMethod == 0)
-					return true
-				endif
-			else
-				; String doesn't match - if iCompareMethod is not the default value of 0, the user wanted anything but the value they requested
-				if(aScriptPropertySet.iCompareMethod != 0)
-					return true
-				endif
-			endif
-		elseif(vPropertyValue as Form)
-			Form checkForm = vPropertyValue as Form
-			Form matchForm = GetScriptPropertySetMatchForm(aScriptPropertySet)
-			
-			if(checkForm == matchForm)
-				if(aScriptPropertySet.iCompareMethod == 0)
-					return true
-				endif
-			else
-				; Form doesn't match - if iCompareMethod is not the default value of 0, the user wanted anything but the value they requested
-				if(aScriptPropertySet.iCompareMethod != 0)
-					return true
-				endif
-			endif
-		endif					
-	endif
-	
-	; No match occurred (or important data was missing)
-	return false
-EndFunction
 
 
 ; -----------------------------------

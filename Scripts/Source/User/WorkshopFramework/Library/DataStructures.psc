@@ -72,52 +72,20 @@ Struct QuestStageSet
 	{ If set to true, this will instead look to see that this stage is NOT complete }
 EndStruct
 
-; 1.2.0 - Expanding common structure options
+; 1.1.12 - Expanding common structure options
 Struct QuestObjectiveSet
 	Quest QuestForm = None
 	{ Quest form. [Optional] Either this, or iFormID + sPluginName have to be set. }
 	Int iFormID = -1
-	{ Decimal conversion of the last 6 digits of a forms Hex ID. [Optional] Either this + sPluginName, or QuestForm have to be set. }
+	{ Decimal conversion of the last 6 digits of a forms Hex ID. [Optional] Either this + sPluginName, or ObjectForm have to be set. }
 	String sPluginName = ""
-	{ Exact file name the form is from (ex. Fallout.esm). [Optional] Either this + iFormID, or QuestForm have to be set. }
-
+	{ Exact file name the form is from (ex. Fallout.esm). [Optional] Either this + iFormID, or ObjectForm have to be set. }
+	
 	Int iObjective = 0
 	{ The objective to check on this quest }
 
 	Int iCompareMethod = 1
-	{ 1 means the objective must be completed, 0 means the objective must not be failed and must not be completed, -1 means the objective must be failed }
-EndStruct
-
-; 1.2.0 - Expanding common structure options
-Struct ScriptPropertySet
-	Form CheckForm = None
-	{ Form to check for script property value. [Optional] Either this, or iCheckFormID + sCheckPluginName have to be set. }
-	Int iCheckFormID = -1
-	{ Decimal conversion of the last 6 digits of a forms Hex ID. [Optional] Either this + sCheckPluginName, or CheckForm have to be set. }
-	String sCheckPluginName = ""
-	{ Exact file name the form is from (ex. Fallout.esm). [Optional] Either this + iCheckFormID, or CheckForm have to be set. }
-	
-	String sScriptName = ""
-	{ Exact script name to be checked, including namespaces. }
-	
-	String sPropertyName = ""
-	{ Exact property name to be checked. }
-	
-	Float fValue = 0.0
-	{ If property holds a float/int/ bool, it will be compared to this (for bool 0.0 = false, 1.0 = true) for float/int this is based on iCompareMethod}
-	
-	String sValue = ""
-	{ If property holds a string, it will be checked for matching against this }
-	
-	Int iCompareMethod = 0
-	{ Float/Int: 0 means the value must be exactly = fValue, -1 means the value must be <= fValue, -2 means the value must be < fValue, 1 means the value must be >= fValue, 2 means the value must be > fValue, String/Form: 0 means check for match, any other value means check for mismatch }
-	
-	Form MatchForm = None
-	{ Form to test property value against if it is a Form. [Optional] Either this, or iMatchFormID + sMatchPluginName have to be set. }
-	Int iMatchFormID = -1
-	{ Decimal conversion of the last 6 digits of a forms Hex ID. [Optional] Either this + sMatchPluginName, or FormToCheck have to be set. }
-	String sMatchPluginName = ""
-	{ Exact file name the form is from (ex. Fallout.esm). [Optional] Either this + iMatchFormID, or FormToCheck have to be set. }
+	{ 1 means the objective must be completed, 0 means the objective most not be failed and must not be completed, -1 means the objective must be failed }
 EndStruct
 
 ; 1.0.4 - Expanding common structure options
